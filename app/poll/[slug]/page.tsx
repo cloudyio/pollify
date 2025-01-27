@@ -1,4 +1,5 @@
 "use client"
+export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -6,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { ChevronLeft } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner" // Import Spinner component
+import { useToast } from "@/components/ui/use-toast"; // Import useToast hook
 
 export default function Page({
   params,
@@ -15,6 +17,7 @@ export default function Page({
   const [slug, setSlug] = useState<string | null>(null)
   interface PollOption {
     text: string;
+    votes: number; // Include votes in the PollOption interface
   }
 
   interface PollData {
@@ -28,6 +31,7 @@ export default function Page({
   const [hasVoted, setHasVoted] = useState(false)
   const [results, setResults] = useState<Record<string, number>>({})
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
+  const { toast } = useToast(); // Initialize toast
 
   useEffect(() => {
     async function fetchSlug() {
@@ -38,30 +42,31 @@ export default function Page({
     fetchSlug()
   }, [params])
 
-  useEffect(() => {
+  const fetchPollData = async () => {
     if (slug) {
-      async function fetchPollData() {
-        const response = await fetch('/api/quick-poll/info', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ pollID: slug }),
-        })
+      const response = await fetch('/api/quick-poll/info', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ pollID: slug }),
+      });
 
-        if (response.ok) {
-          const data = await response.json()
-          setPollData(data.poll)
-          const endTime = new Date(data.poll.expiresAt).getTime()
-          setTimeLeft(endTime - Date.now())
-        } else {
-          console.error('Failed to fetch poll data')
-        }
+      if (response.ok) {
+        const data = await response.json();
+        setPollData(data.poll);
+        const endTime = new Date(data.poll.expiresAt).getTime();
+        setTimeLeft(endTime - Date.now());
+        setResults(data.poll.results || {}); // Set the results from the fetched data
+      } else {
+        console.error('Failed to fetch poll data');
       }
-
-      fetchPollData()
     }
-  }, [slug])
+  };
+
+  useEffect(() => {
+    fetchPollData();
+  }, [slug]);
 
   useEffect(() => {
     const storedVote = localStorage.getItem(`pollVote_${slug}`)
@@ -100,19 +105,44 @@ export default function Page({
       })
 
       if (response.ok) {
-        const newResults = { ...results }
-        newResults[selectedOption] = (newResults[selectedOption] || 0) + 1
-        setResults(newResults)
         setHasVoted(true)
-        localStorage.setItem(`pollVote_${slug}`, JSON.stringify(newResults))
+        localStorage.setItem(`pollVote_${slug}`, JSON.stringify(results))
         console.log("Vote submitted successfully")
+
+        // Fetch the latest poll data from the database
+        await fetchPollData();
       } else {
         console.error("Failed to submit vote")
       }
     }
   }
 
-  const totalVotes = Object.values(results).reduce((sum, count) => sum + count, 0)
+  const handleUpdatePoll = async () => {
+    if (slug && pollData) {
+      const response = await fetch('/api/quick-poll/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pollID: slug,
+          description: pollData.description,
+          options: Object.values(pollData.options).map(option => option.text),
+          duration: new Date(pollData.expiresAt).getTime() - Date.now(),
+        }),
+      });
+
+      if (response.ok) {
+        toast({ title: "Success", description: "Poll updated successfully", status: "success" });
+        // Fetch the latest poll data from the database
+        await fetchPollData();
+      } else {
+        toast({ title: "Error", description: "Failed to update poll", status: "error" });
+      }
+    }
+  };
+
+  const totalVotes = Object.values(pollData?.options || {}).reduce((sum, option) => sum + option.votes, 0);
 
   if (!pollData) {
     return (
@@ -126,6 +156,7 @@ export default function Page({
 
   return (
     <div className="container mx-auto p-4 flex justify-center items-center min-h-[calc(100vh-4rem)] ">
+        
       <div className="w-full max-w-lg mx-auto shadow-lg rounded-lg p-8 bg-[#090b1b]">
         <div className="mb-6">
           <h1 className="text-2xl font-bold mb-2">{pollData.description}</h1>
@@ -144,14 +175,16 @@ export default function Page({
           ) : (
             <div className="space-y-4">
               {Object.entries(pollData.options).map(([key, option]) => {
-                const voteCount = results[key] || 0
+                const voteCount = results[key] || option.votes || 0; // Use option.votes if results are not available
                 const percentage = totalVotes > 0 ? (voteCount / totalVotes) * 100 : 0
                 return (
                   <div key={key} className="space-y-2">
+                    <p>{option.text}</p>
                     <div className="flex justify-between text-sm">
                       <span>
                         {voteCount} votes ({percentage.toFixed(1)}%)
                       </span>
+                      {key === selectedOption && <span className="text-blue-600"> (Your vote)</span>}
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div className="bg-[#4f01d5] h-2.5 rounded-full" style={{ width: `${percentage}%` }}></div>
@@ -174,6 +207,7 @@ export default function Page({
               Vote Again
             </Button>
           )}
+          
         </div>
         {timeLeft !== null && (
           <div className="mt-6 text-center text-sm text-gray-500">
