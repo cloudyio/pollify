@@ -112,7 +112,6 @@ export default function AdminPage({
               return (
                 <div key={key} className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>{option.text}</span>
                     <span>
                       {voteCount} votes ({percentage.toFixed(1)}%)
                     </span>

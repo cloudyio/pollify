@@ -13,7 +13,17 @@ export default function Page({
   params: Promise<{ slug: string }>
 }) {
   const [slug, setSlug] = useState<string | null>(null)
-  const [pollData, setPollData] = useState<any>(null)
+  interface PollOption {
+    text: string;
+  }
+
+  interface PollData {
+    description: string;
+    options: Record<string, PollOption>;
+    expiresAt: string;
+  }
+
+  const [pollData, setPollData] = useState<PollData | null>(null)
   const [selectedOption, setSelectedOption] = useState<string | null>(null)
   const [hasVoted, setHasVoted] = useState(false)
   const [results, setResults] = useState<Record<string, number>>({})
@@ -139,7 +149,6 @@ export default function Page({
                 return (
                   <div key={key} className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span>{option.text}</span>
                       <span>
                         {voteCount} votes ({percentage.toFixed(1)}%)
                       </span>

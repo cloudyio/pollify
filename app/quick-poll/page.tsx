@@ -181,13 +181,13 @@ export default function QuickNotesForm() {
             <DialogTitle className="mb-8">Poll Created Successfully!</DialogTitle>
             <DialogDescription>
               <span className="flex items-center justify-between">
-                <span>Poll Link: <a href={pollLink} target="_blank" rel="noopener noreferrer">{pollLink}</a></span>
+                <span>Poll Link: <a href={pollLink ?? "#"} target="_blank" rel="noopener noreferrer">{pollLink ?? "N/A"}</a></span>
                 <Button variant="ghost" size="icon" onClick={() => copyToClipboard(pollLink!, "poll")}>
                   {copied === "poll" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </span>
               <span className="flex items-center justify-between mt-2">
-                <span>Admin Link: <a href={adminLink} target="_blank" rel="noopener noreferrer">{adminLink}</a></span>
+                <span>Admin Link: <a href={adminLink ?? "#"} target="_blank" rel="noopener noreferrer">{adminLink ?? "N/A"}</a></span>
                 <Button variant="ghost" size="icon" onClick={() => copyToClipboard(adminLink!, "admin")}>
                   {copied === "admin" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                 </Button>

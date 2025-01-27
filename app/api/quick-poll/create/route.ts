@@ -19,7 +19,7 @@ async function generateUniquePollId() {
   let exists = true;
   while (exists) {
     pollId = generateRandomId(5);
-    const poll = await client.db("polly").collection("polls").findOne({ _id: pollId });
+    const poll = await client.db("polly").collection("polls").findOne({ _id: new ObjectId(pollId) });
     if (!poll) {
       exists = false;
     }
@@ -49,7 +49,14 @@ export async function POST(request: Request) {
   const adminId = generateRandomId(8);
   const expirationDate = new Date(Date.now() + duration);
 
-  await client.db("polly").collection("polls").insertOne({ _id: pollId, description, options: formattedOptions, createdBy: id, expiresAt: expirationDate, adminId });
+  await client.db("polly").collection("polls").insertOne({ 
+    _id: new ObjectId(pollId), 
+    description, 
+    options: formattedOptions, 
+    createdBy: id, 
+    expiresAt: expirationDate, 
+    adminId 
+  });
 
   return new Response(JSON.stringify({ message: "Poll created successfully", pollId, adminId }), { status: 201 });
 }
