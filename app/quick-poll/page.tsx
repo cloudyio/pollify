@@ -1,18 +1,24 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { PlusCircle, X, Clock } from "lucide-react"
+import { PlusCircle, X, Clock, Copy, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { TimePickerInput } from "@/components/time-picker-input"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 
 export default function QuickNotesForm() {
   const [question, setQuestion] = useState("")
   const [options, setOptions] = useState<string[]>([""])
   const [duration, setDuration] = useState(1)
   const [date, setDate] = useState<Date | undefined>(new Date(new Date().setHours(0, 0, 0, 0)))
+  const [loading, setLoading] = useState(false)
+  const [pollLink, setPollLink] = useState<string | null>(null)
+  const [adminLink, setAdminLink] = useState<string | null>(null)
+  const [showDialog, setShowDialog] = useState(false)
+  const [copied, setCopied] = useState<string | null>(null)
 
   const minuteRef = useRef<HTMLInputElement>(null)
   const hourRef = useRef<HTMLInputElement>(null)
@@ -35,8 +41,9 @@ export default function QuickNotesForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLoading(true)
     const currentDate = new Date()
-    const expirationDate = new Date(currentDate.getTime() + date.getTime())
+    const expirationDate = date ? date.getTime() - new Date().setHours(0, 0, 0, 0) : 0;
     const response = await fetch('/api/quick-poll/create', {
       method: 'POST',
       headers: {
@@ -46,10 +53,24 @@ export default function QuickNotesForm() {
     })
 
     if (response.ok) {
+      const data = await response.json()
+      setPollLink(`https://poll.cloudyio.me/poll/${data.pollId}`)
+      setAdminLink(`https://poll.cloudyio.me/poll/${data.pollId}/${data.adminId}`)
+      setShowDialog(true)
+      setQuestion("")
+      setOptions([""])
+      setDate(new Date(new Date().setHours(0, 0, 0, 0)))
       console.log("Poll created successfully")
     } else {
       console.error("Failed to create poll")
     }
+    setLoading(false)
+  }
+
+  const copyToClipboard = (text: string, type: string) => {
+    navigator.clipboard.writeText(text)
+    setCopied(type)
+    setTimeout(() => setCopied(null), 2000)
   }
 
   return (
@@ -149,11 +170,35 @@ export default function QuickNotesForm() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full">
-            Submit Poll
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Submitting..." : "Submit Poll"}
           </Button>
         </form>
       </div>
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="mb-8">Poll Created Successfully!</DialogTitle>
+            <DialogDescription>
+              <span className="flex items-center justify-between">
+                <span>Poll Link: <a href={pollLink} target="_blank" rel="noopener noreferrer">{pollLink}</a></span>
+                <Button variant="ghost" size="icon" onClick={() => copyToClipboard(pollLink!, "poll")}>
+                  {copied === "poll" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                </Button>
+              </span>
+              <span className="flex items-center justify-between mt-2">
+                <span>Admin Link: <a href={adminLink} target="_blank" rel="noopener noreferrer">{adminLink}</a></span>
+                <Button variant="ghost" size="icon" onClick={() => copyToClipboard(adminLink!, "admin")}>
+                  {copied === "admin" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                </Button>
+              </span>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => window.location.href = pollLink!}>Done</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -45,11 +45,9 @@ export async function POST(request: Request) {
     return acc
   }, {})
 
-  const expirationDate = new Date();
-  expirationDate.setHours(expirationDate.getHours() + duration);
-
   const pollId = await generateUniquePollId();
   const adminId = generateRandomId(8);
+  const expirationDate = new Date(Date.now() + duration);
 
   await client.db("polly").collection("polls").insertOne({ _id: pollId, description, options: formattedOptions, createdBy: id, expiresAt: expirationDate, adminId });
 
