@@ -19,7 +19,8 @@ async function generateUniquePollId() {
   let exists = true;
   while (exists) {
     pollId = generateRandomId(5);
-    const poll = await client.db("polly").collection("polls").findOne({ _id: new ObjectId(pollId) });
+    // @ts-ignore
+    const poll = await client.db("polly").collection("polls").findOne({ _id: pollId });
     if (!poll) {
       exists = false;
     }
@@ -50,7 +51,8 @@ export async function POST(request: Request) {
   const expirationDate = new Date(Date.now() + duration);
 
   await client.db("polly").collection("polls").insertOne({ 
-    _id: new ObjectId(pollId), 
+    // @ts-ignore
+    _id: pollId as string, 
     description, 
     options: formattedOptions, 
     createdBy: id, 
