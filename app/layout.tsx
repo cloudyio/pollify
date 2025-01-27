@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { inter } from '@/app/ui/fonts';
+import { inter } from "@/app/ui/fonts";
 import Navbar from "@/components/Navbar";
 
-
-import { ThemeProvider } from "@/components/theme-provider"
-
-
-
+import { ThemeProvider } from "@/components/theme-provider";
+import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -21,16 +18,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-            <body className={`${inter.className} antialiased`}>
-
+      <body className={`${inter.className} antialiased`}>
         <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SessionProvider>
             <Navbar />
-        {children}
+
+            {children}
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>
