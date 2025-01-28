@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import Link from 'next/link'
-import Navbar from "@/components/Navbar" // Import Navbar component
+import Navbar from "@/components/Navbar" 
 
 interface Poll {
   _id: string;

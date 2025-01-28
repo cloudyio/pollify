@@ -6,8 +6,8 @@ interface Poll {
   adminId: string;
   title: string;
   options: Array<{ id: string; text: string }>;
-  color: string; // Add color property
-  canVoteMoreThanOnce: boolean; // Add canVoteMoreThanOnce property
+  color: string;
+  canVoteMoreThanOnce: boolean;
 }
 
 interface Vote {

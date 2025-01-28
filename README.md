@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Polly
+## Make polls and share with ease
 
-## Getting Started
+TLDR:
+Polly is a basic web app to allow you to quickly setup polls for any occasion, the polls are easily customisable while setting up and after.
 
-First, run the development server:
+Each poll is given an admin link to view and manage your poll without hastle and comes with poll saving if signed in (optional)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features:
+- Easy to navigate ui
+- Customizable poll themes
+- Multi vote prevention
+- Poll saving
+- Admin managment
+- Custom length
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Built with:
+- Nextjs
+- Shadcn
+- Tailwind
+- Vercel
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## How to run
+Running pollify is very simple and can be done with vercel for free or using node.js
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+### Self Hosting
+1. Setup a mongo db, can be done with [mongodb cloud](https://www.mongodb.com/) where you can setup a free M0 cluster
+2. Clone project with `git clone https://github.com/cloudyio/pollify`
+3. Copy contents of template and create a file named `.env.local`, paste contents into new file
+4. Go to the [github oauth dashboard](https://github.com/settings/developers) and create a new app
+5. Copy id and place in `AUTH_GITHUB_ID`
+6. Create a token and place in `AUTH_GITHUB_SECRET` (oauth secrets can only be seen once and have to be reset if lost)
+7. Copy your mongo URI and paste into `MONGO_URI`
+8. Open a terminal inside the git folder and run `npx auth secret`, this will generate an oauth secret for auth.js and place it in your env file
+9. Run `npm run build` to build your project
+10. You can now run `npm run start` which will setup a node server for polly
 
-To learn more about Next.js, take a look at the following resources:
+### Vercel Hosting
+1. Setup a mongo db, can be done with [mongodb cloud](https://www.mongodb.com/) where you can setup a free M0 cluster
+2. Open any text editor
+3. Create a fork of this repository
+4. Copy contents of [template](https://raw.githubusercontent.com/cloudyio/pollify/refs/heads/master/template.env) and paste contents into the editor
+5. Go to the [github oauth dashboard](https://github.com/settings/developers) and create a new app
+6. Copy id and place in `AUTH_GITHUB_ID`
+7. Create a token and place in `AUTH_GITHUB_SECRET` (oauth secrets can only be seen once and have to be reset if lost)
+8. Copy your mongo URI and paste into `MONGO_URI`
+9. Open a terminal inside the git folder and run `npx auth secret`, this will generate an oauth secret for auth.js and place it in your env file
+10. Go to vercel and create a new project
+11. Click import on the forked project
+12. Copy env from text editor and paste into enviromental variables on the dashboard
+13. Click deploy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
