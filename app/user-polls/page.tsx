@@ -30,16 +30,22 @@ const UserPolls = () => {
   const [polls, setPolls] = useState<Poll[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  let session = true;
 
   useEffect(() => {
     const fetchPolls = async () => {
       try {
         const response = await fetch('/api/quick-poll/user-polls');
         if (!response.ok) {
-          throw new Error('Failed to fetch polls');
+          session = false;
         }
+        
         const data = await response.json();
-        setPolls(data.polls);
+        if (data.polls) {
+          setPolls(data.polls);
+        } else {
+          setPolls([]);
+        }
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
@@ -56,9 +62,13 @@ const UserPolls = () => {
 
   if (error) {
     return (
-      <Alert variant="destructive">
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
+      <div>
+        <Navbar />
+      <div className="flex justify-center items-center">
+        <h1>Unauthorised</h1>
+
+      </div>
+      </div>
     )
   }
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useSession } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
 
 import { Menu, X, ChevronDown, PlusSquare, BarChart2, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -70,7 +70,7 @@ export default function Navbar() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Log out</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => signOut() }>Log out</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
@@ -123,7 +123,7 @@ export default function Navbar() {
             </div>
             <div className="mt-3 space-y-1">
               {user ? (
-                <button className="block w-full text-left px-4 py-2 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-gray-100">
+                <button className="block w-full text-left px-4 py-2 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-gray-100" onClick={() => signOut()}>
                   Log out
                 </button>
               ) : (

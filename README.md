@@ -1,6 +1,8 @@
 # Polly
 ## Make polls and share with ease
 
+[Demo video](https://www.youtube.com/watch?v=cNc9g3lnwSs)
+
 TLDR:
 Polly is a basic web app to allow you to quickly setup polls for any occasion, the polls are easily customisable while setting up and after.
 
@@ -50,4 +52,3 @@ Running pollify is very simple and can be done with vercel for free or using nod
 11. Click import on the forked project
 12. Copy env from text editor and paste into enviromental variables on the dashboard
 13. Click deploy
-

@@ -17,7 +17,7 @@ export default function Home() {
 
         <div className="space-x-4">
           <Button asChild>
-            <Link href="/demo">Demo</Link>
+            <Link href="https://www.youtube.com/watch?v=cNc9g3lnwSs">Demo</Link>
           </Button>
           <Button asChild variant="outline">
             <Link href="/quick-poll">Create a Poll</Link>
