@@ -21,9 +21,13 @@ export async function POST(request: Request) {
   }
 
   const formattedOptions = options.reduce((acc, option, index) => {
-    acc[`${index + 1}`] = { text: option, votes: 0 }
-    return acc
-  }, {})
+    const existingOptionKey = Object.keys(poll.options).find(key => poll.options[key].text === option);
+    acc[existingOptionKey || `${index + 1}`] = {
+      text: option,
+      votes: existingOptionKey ? poll.options[existingOptionKey].votes : 0 
+    };
+    return acc;
+  }, {});
 
   const result = await client.db("polly").collection("polls").updateOne(
     { _id: pollID, adminId: adminID },

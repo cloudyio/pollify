@@ -149,6 +149,17 @@ export default function AdminPage({
 
   const removeOption = (index: number) => {
     const updatedOptions = options.filter((_, i) => i !== index)
+    const updatedPollData: PollData = { 
+      description: pollData?.description || "", 
+      options: pollData?.options || {}, 
+      expiresAt: pollData?.expiresAt || "" 
+    }
+    if (updatedPollData) {
+      if (updatedPollData.options) {
+        delete updatedPollData.options[index + 1]
+      }
+      setPollData(updatedPollData)
+    }
     setOptions(updatedOptions)
   }
 

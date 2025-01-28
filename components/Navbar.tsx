@@ -17,7 +17,7 @@ import {
 
 const navItems = [
   { name: "Home", href: "/" },
-  { name: "My Polls", href: "/my-polls" },
+  { name: "My Polls", href: "/user-polls" },
 ]
 
 export default function Navbar() { 
@@ -70,15 +70,6 @@ export default function Navbar() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <BarChart2 className="mr-2 h-4 w-4" />
-                      <span>Analytics</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
                     <DropdownMenuItem>Log out</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -124,7 +115,6 @@ export default function Navbar() {
               </div>
               <div className="ml-3">
                 <div className="text-base font-medium text-foreground">{user ? user.name : "Guest"}</div>
-                <div className="text-sm font-medium text-muted-foreground">{user ? user.email : ""}</div>
               </div>
               <Button variant="ghost" size="icon" className="ml-auto">
                 <PlusSquare className="h-6 w-6" />
@@ -133,23 +123,9 @@ export default function Navbar() {
             </div>
             <div className="mt-3 space-y-1">
               {user ? (
-                <>
-                  <Link
-                    href="/profile"
-                    className="block px-4 py-2 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-gray-100"
-                  >
-                    Your Profile
-                  </Link>
-                  <Link
-                    href="/analytics"
-                    className="block px-4 py-2 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-gray-100"
-                  >
-                    Analytics
-                  </Link>
-                  <button className="block w-full text-left px-4 py-2 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-gray-100">
-                    Sign out
-                  </button>
-                </>
+                <button className="block w-full text-left px-4 py-2 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-gray-100">
+                  Log out
+                </button>
               ) : (
                 <Link
                   href="/login"

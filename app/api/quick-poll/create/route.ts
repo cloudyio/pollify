@@ -1,4 +1,3 @@
-export const dynamic = 'force-static'
 import { auth } from "./../../../../auth"
 import { MongoClient, ServerApiVersion, ObjectId } from "mongodb"
 
@@ -34,7 +33,12 @@ export async function POST(request: Request) {
   const { description, options, duration } = await request.json();
 
   if (session) {
-    id = session?.user?.id
+    const imageUrl = session?.user?.image;
+    if (imageUrl) {
+      const urlParts = imageUrl.split('/');
+      id = urlParts[urlParts.length - 1].split('?')[0];
+    }
+    console.log(id)
   }
 
   if (!description || !Array.isArray(options) || options.length === 0 || !duration) {
