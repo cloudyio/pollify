@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { ChevronLeft } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner" // Import Spinner component
 import { useToast } from "@/components/ui/use-toast"; // Import useToast hook
+import Navbar from "@/components/Navbar" // Import Navbar component
 
 export default function Page({
   params,
@@ -24,6 +25,8 @@ export default function Page({
     description: string;
     options: Record<string, PollOption>;
     expiresAt: string;
+    color: string; // Add color property
+    canVoteMoreThanOnce: boolean; // Add canVoteMoreThanOnce property
   }
 
   const [pollData, setPollData] = useState<PollData | null>(null)
@@ -109,10 +112,11 @@ export default function Page({
 
       if (response.ok) {
         setHasVoted(true)
-        localStorage.setItem(`pollVote_${slug}`, JSON.stringify(results))
+        if (!pollData?.canVoteMoreThanOnce) {
+          localStorage.setItem(`pollVote_${slug}`, JSON.stringify(results))
+        }
         console.log("Vote submitted successfully")
 
-        // Fetch the latest poll data from the database
         await fetchPollData();
       } else {
         console.error("Failed to submit vote")
@@ -147,6 +151,17 @@ export default function Page({
 
   const totalVotes = Object.values(pollData?.options || {}).reduce((sum, option) => sum + option.votes, 0);
 
+  const getTextColor = (bgColor: string) => {
+    const color = bgColor.charAt(0) === '#' ? bgColor.substring(1, 7) : bgColor;
+    const r = parseInt(color.substring(0, 2), 16);
+    const g = parseInt(color.substring(2, 4), 16);
+    const b = parseInt(color.substring(4, 6), 16);
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness > 155 ? '#000000' : '#FFFFFF';
+  }
+
+  const textColor = pollData ? getTextColor(pollData.color) : '#000000';
+
   if (pollNotFound) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -166,65 +181,68 @@ export default function Page({
   const isPollEnded = timeLeft !== null && timeLeft <= 0
 
   return (
-    <div className="container mx-auto p-4 flex justify-center items-center min-h-[calc(100vh-4rem)] ">
-        
-      <div className="w-full max-w-lg mx-auto shadow-lg rounded-lg p-8 bg-[#090b1b]">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold mb-2">{pollData.description}</h1>
-          <p className="text-gray-700">{hasVoted ? "Poll results" : "Select an option and submit your vote"}</p>
-        </div>
-        <div className="mb-6">
-          {!hasVoted && !isPollEnded ? (
-            <RadioGroup value={selectedOption || ""} onValueChange={setSelectedOption}>
-              {Object.entries(pollData.options).map(([key, option]) => (
-                <div key={key} className="flex items-center space-x-3 mb-2">
-                  <RadioGroupItem value={key} id={key} />
-                  <Label htmlFor={key}>{option.text}</Label>
-                </div>
-              ))}
-            </RadioGroup>
-          ) : (
-            <div className="space-y-4">
-              {Object.entries(pollData.options).map(([key, option]) => {
-                const voteCount = results[key] || option.votes || 0; // Use option.votes if results are not available
-                const percentage = totalVotes > 0 ? (voteCount / totalVotes) * 100 : 0
-                return (
-                  <div key={key} className="space-y-2">
-                    <p>{option.text}</p>
-                    <div className="flex justify-between text-sm">
-                      <span>
-                        {voteCount} votes ({percentage.toFixed(1)}%)
-                      </span>
-                      {key === selectedOption && <span className="text-blue-600"> (Your vote)</span>}
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div className="bg-[#4f01d5] h-2.5 rounded-full" style={{ width: `${percentage}%` }}></div>
-                    </div>
+    <div style={{ backgroundColor: pollData.color, color: textColor, minHeight: '100vh' }}>
+      <div className="container mx-auto p-4 flex justify-center items-center min-h-[calc(100vh-4rem)]">
+        <div className="w-full max-w-lg mx-auto shadow-lg rounded-lg p-8" style={{ backgroundColor: pollData.color, color: textColor }}>
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold mb-2">{pollData.description}</h1>
+            <p className="text-gray-700">{hasVoted ? "Poll results" : "Select an option and submit your vote"}</p>
+          </div>
+          <div className="mb-6">
+            {!hasVoted && !isPollEnded ? (
+              <RadioGroup value={selectedOption || ""} onValueChange={setSelectedOption}>
+                {Object.entries(pollData.options).map(([key, option]) => (
+                  <div key={key} className="flex items-center space-x-3 mb-2">
+                    <RadioGroupItem value={key} id={key} />
+                    <Label htmlFor={key}>{option.text}</Label>
                   </div>
-                )
-              })}
-              <p className="text-sm text-gray-500 mt-4">Total votes: {totalVotes}</p>
+                ))}
+              </RadioGroup>
+            ) : (
+              <div className="space-y-4">
+                {Object.entries(pollData.options).map(([key, option]) => {
+                  const voteCount = results[key] || option.votes || 0; // Use option.votes if results are not available
+                  const percentage = totalVotes > 0 ? (voteCount / totalVotes) * 100 : 0
+                  return (
+                    <div key={key} className="space-y-2">
+                      <p>{option.text}</p>
+                      <div className="flex justify-between text-sm">
+                        <span>
+                          {voteCount} votes ({percentage.toFixed(1)}%)
+                        </span>
+                        {key === selectedOption && <span className="text-blue-600"> (Your vote)</span>}
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <div className="bg-[#4f01d5] h-2.5 rounded-full" style={{ width: `${percentage}%` }}></div>
+                      </div>
+                    </div>
+                  )
+                })}
+                <p className="text-sm text-gray-500 mt-4">Total votes: {totalVotes}</p>
+              </div>
+            )}
+          </div>
+          <div className="flex justify-between items-center">
+            {!hasVoted && !isPollEnded ? (
+              <Button onClick={handleVote} disabled={!selectedOption}>
+                Submit Vote
+              </Button>
+            ) : (
+              <Button variant="outline" onClick={() => setHasVoted(false)} className="flex items-center gap-2">
+                <ChevronLeft className="w-4 h-4" />
+                Vote Again
+              </Button>
+            )}
+          </div>
+          {timeLeft !== null && (
+            <div className="mt-6 text-center text-sm text-gray-500">
+              {isPollEnded ? "Poll has ended" : `Time left: ${formatTimeLeft(timeLeft)}`}
             </div>
           )}
         </div>
-        <div className="flex justify-between items-center">
-          {!hasVoted && !isPollEnded ? (
-            <Button onClick={handleVote} disabled={!selectedOption}>
-              Submit Vote
-            </Button>
-          ) : (
-            <Button variant="outline" disabled className="flex items-center gap-2">
-              <ChevronLeft className="w-4 h-4" />
-              Vote Again
-            </Button>
-          )}
-          
-        </div>
-        {timeLeft !== null && (
-          <div className="mt-6 text-center text-sm text-gray-500">
-            {isPollEnded ? "Poll has ended" : `Time left: ${formatTimeLeft(timeLeft)}`}
-          </div>
-        )}
+      </div>
+      <div className="mt-6 text-center text-sm" style={{ backgroundColor: pollData.color, color: textColor }}>
+        Made with Pollify
       </div>
     </div>
   )

@@ -30,7 +30,7 @@ async function generateUniquePollId() {
 export async function POST(request: Request) {
   let id = null
   const session = await auth()
-  const { description, options, duration } = await request.json();
+  const { description, options, duration, color, canVoteMoreThanOnce } = await request.json();
 
   if (session) {
     const imageUrl = session?.user?.image;
@@ -61,7 +61,9 @@ export async function POST(request: Request) {
     options: formattedOptions, 
     createdBy: id, 
     expiresAt: expirationDate, 
-    adminId 
+    adminId,
+    color,
+    canVoteMoreThanOnce
   });
 
   return new Response(JSON.stringify({ message: "Poll created successfully", pollId, adminId }), { status: 201 });

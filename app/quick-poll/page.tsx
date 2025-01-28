@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { TimePickerInput } from "@/components/time-picker-input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { Checkbox } from "@/components/ui/checkbox"
+import Navbar from "@/components/Navbar" // Import Navbar component
 
 export default function QuickNotesForm() {
   const [question, setQuestion] = useState("")
@@ -19,6 +21,9 @@ export default function QuickNotesForm() {
   const [adminLink, setAdminLink] = useState<string | null>(null)
   const [showDialog, setShowDialog] = useState(false)
   const [copied, setCopied] = useState<string | null>(null)
+  const [showAdvanced, setShowAdvanced] = useState(false)
+  const [color, setColor] = useState("#0b0613")
+  const [canVoteMoreThanOnce, setCanVoteMoreThanOnce] = useState(false)
 
   const minuteRef = useRef<HTMLInputElement>(null)
   const hourRef = useRef<HTMLInputElement>(null)
@@ -49,7 +54,13 @@ export default function QuickNotesForm() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ description: question, options, duration: expirationDate }),
+      body: JSON.stringify({ 
+        description: question, 
+        options, 
+        duration: expirationDate,
+        color,
+        canVoteMoreThanOnce
+      }),
     })
 
     if (response.ok) {
@@ -75,6 +86,7 @@ export default function QuickNotesForm() {
 
   return (
     <div>
+      <Navbar />
       <div className="max-w-lg mx-auto p-6 space-y-6">
         <h1 className="text-center text-3xl font-bold">Quick Poll</h1>
         <h2 className="text-center font-semibold text-md"> Quickly create a poll with a sharable link</h2>
@@ -120,6 +132,33 @@ export default function QuickNotesForm() {
               Add Option
             </Button>
           </div>
+
+          <Button type="button" variant="outline" onClick={() => setShowAdvanced(!showAdvanced)}>
+            {showAdvanced ? "Hide Advanced" : "Show Advanced"}
+          </Button>
+          {showAdvanced && (
+            <div className="space-y-4">
+              <Label className="text-lg font-medium">Advanced Options</Label>
+              <div className="mt-2">
+                <Label htmlFor="color-picker" className="text-sm">Colour theme:</Label>
+                <Input
+                  type="color"
+                  id="color-picker"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  className="mt-1 w-14 h-11"
+                />
+              </div>
+              <div className="mt-2 flex items-center space-x-2">
+                <Checkbox
+                  id="vote-more-than-once"
+                  checked={canVoteMoreThanOnce}
+                  onCheckedChange={(checked) => setCanVoteMoreThanOnce(!!checked)}
+                />
+                <Label htmlFor="vote-more-than-once" className="text-sm">Can vote more than once</Label>
+              </div>
+            </div>
+          )}
 
           <div className="flex items-end gap-2">
             <div className="grid gap-1 text-center">

@@ -9,6 +9,7 @@ import { Spinner } from "@/components/ui/spinner" // Import Spinner component
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import Navbar from "@/components/Navbar" // Import Navbar component
 
 interface PollOption {
   text: string;
@@ -200,7 +201,10 @@ export default function AdminPage({
   const isPollEnded = timeLeft !== null && timeLeft <= 0
 
   return (
+    <div>
+      <Navbar />
     <div className="container mx-auto p-4 mt-24">
+      
       <div className="w-full max-w-md mx-auto shadow-md rounded-lg p-6">
         <div className="mb-4">
           <h1 className="text-xl font-bold">{pollData.description}</h1>
@@ -300,6 +304,7 @@ export default function AdminPage({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
     </div>
   )
 }

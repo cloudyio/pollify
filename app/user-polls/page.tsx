@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import Link from 'next/link'
+import Navbar from "@/components/Navbar" // Import Navbar component
 
 interface Poll {
   _id: string;
@@ -63,6 +64,7 @@ const UserPolls = () => {
 
   return (
     <div className="container mx-auto p-4">
+      <Navbar />
       <h1 className="text-3xl font-bold mb-6">Your Polls</h1>
       {polls.length === 0 ? (
         <p className="text-muted-foreground">No polls found.</p>

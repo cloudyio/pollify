@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { inter } from "@/app/ui/fonts";
-import Navbar from "@/components/Navbar";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { SessionProvider } from "next-auth/react";
@@ -26,8 +25,6 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <SessionProvider>
-            <Navbar />
-
             {children}
           </SessionProvider>
         </ThemeProvider>

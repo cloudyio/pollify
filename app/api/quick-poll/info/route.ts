@@ -6,6 +6,8 @@ interface Poll {
   adminId: string;
   title: string;
   options: Array<{ id: string; text: string }>;
+  color: string; // Add color property
+  canVoteMoreThanOnce: boolean; // Add canVoteMoreThanOnce property
 }
 
 interface Vote {
@@ -46,5 +48,5 @@ export async function POST(request: Request) {
 
   const { adminId, ...pollData } = poll;
 
-  return new Response(JSON.stringify({ poll: { ...pollData, results: voteCounts } }), { status: 200 });
+  return new Response(JSON.stringify({ poll: { ...pollData, results: voteCounts, color: poll.color, canVoteMoreThanOnce: poll.canVoteMoreThanOnce } }), { status: 200 });
 }
