@@ -32,6 +32,7 @@ export default function Page({
   const [results, setResults] = useState<Record<string, number>>({})
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
   const { toast } = useToast(); // Initialize toast
+  const [pollNotFound, setPollNotFound] = useState<boolean>(false);
 
   useEffect(() => {
     async function fetchSlug() {
@@ -58,6 +59,8 @@ export default function Page({
         const endTime = new Date(data.poll.expiresAt).getTime();
         setTimeLeft(endTime - Date.now());
         setResults(data.poll.results || {}); // Set the results from the fetched data
+      } else if (response.status === 404) {
+        setPollNotFound(true);
       } else {
         console.error('Failed to fetch poll data');
       }
@@ -144,10 +147,18 @@ export default function Page({
 
   const totalVotes = Object.values(pollData?.options || {}).reduce((sum, option) => sum + option.votes, 0);
 
+  if (pollNotFound) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p className="text-red-600">Poll not found</p>
+      </div>
+    )
+  }
+
   if (!pollData) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <Spinner className="w-12 h-12 text-blue-600" /> {/* Add Spinner component */}
+        <Spinner className="w-12 h-12 text-blue-600" /> 
       </div>
     )
   }

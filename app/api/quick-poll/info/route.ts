@@ -5,7 +5,7 @@ const uri = process.env.MONGO_URI as string;
 const client = new MongoClient(uri, { serverApi: ServerApiVersion.v1 });
 
 export async function POST(request: Request) {
-  const { pollID } = await request.json();
+  const { pollID, adminID } = await request.json();
 
   if (!pollID) {
     return new Response(JSON.stringify({ error: "Invalid input" }), { status: 400 });
@@ -15,6 +15,10 @@ export async function POST(request: Request) {
 
   if (!poll) {
     return new Response(JSON.stringify({ error: "Poll not found" }), { status: 404 });
+  }
+
+  if (adminID && poll.adminId !== adminID) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
 
   const results = await client.db("polly").collection("votes").find({ pollID }).toArray();
